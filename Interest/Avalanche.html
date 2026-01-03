@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Debt Avalanche Calculator</title>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -13,6 +14,7 @@
   --primary:#2563eb;
   --success:#16a34a;
   --danger:#ef4444;
+  --text:#0f172a;
   --muted:#64748b;
   --border:#e5e7eb;
   --radius:16px;
@@ -23,8 +25,9 @@ body{
   margin:0;
   font-family:Inter,system-ui,Arial;
   background:var(--bg);
+  color:var(--text);
 }
-h1{text-align:center;color:var(--primary);margin:22px}
+h1{text-align:center;color:var(--primary);margin:22px 0}
 .container{max-width:1200px;margin:auto;padding:16px}
 .grid{display:grid;grid-template-columns:380px 1fr;gap:28px}
 .card{
@@ -33,22 +36,21 @@ h1{text-align:center;color:var(--primary);margin:22px}
   box-shadow:var(--shadow);
   padding:24px;
 }
-.section{margin-bottom:18px}
-.section h3{color:var(--primary);margin-bottom:10px}
+.section{margin-bottom:20px}
 label{font-size:12px;color:var(--muted)}
 input,select{
   width:100%;
-  padding:10px;
+  padding:11px;
   border-radius:12px;
   border:1px solid var(--border);
-  margin-bottom:10px
+  margin-bottom:10px;
 }
 button{
   padding:14px;
   border:none;
   border-radius:14px;
   font-weight:600;
-  cursor:pointer
+  cursor:pointer;
 }
 .primary{background:var(--primary);color:#fff}
 .secondary{background:#eef2ff}
@@ -57,39 +59,50 @@ button{
   display:grid;
   grid-template-columns:repeat(4,1fr);
   gap:14px;
+  margin-bottom:18px;
 }
 .result{
   background:#f8fafc;
-  padding:14px;
   border-radius:14px;
-  text-align:center
+  padding:14px;
+  text-align:center;
 }
 .result b{font-size:18px;display:block}
+.result small{font-size:12px;color:var(--muted)}
+
 .progress{
   height:14px;
   background:#e5e7eb;
   border-radius:999px;
   overflow:hidden;
-  margin:18px 0
+  margin-bottom:18px;
 }
 .progress span{
   display:block;
   height:100%;
   width:0%;
-  background:linear-gradient(90deg,var(--primary),var(--success))
+  background:linear-gradient(90deg,var(--primary),var(--success));
+  transition:.6s;
 }
 
-.chart-box{height:260px}
+.chart-box{height:260px;margin-bottom:18px}
 
 .table-wrap{
+  max-height:320px;
+  overflow:auto;
   border:1px solid var(--border);
-  border-radius:14px;
-  overflow:hidden;
-  margin-top:16px
+  border-radius:12px;
 }
-.table-body{max-height:320px;overflow:auto}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th,td{padding:8px;border-bottom:1px solid var(--border);text-align:right}
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+th,td{
+  padding:8px;
+  border-bottom:1px solid var(--border);
+  text-align:right;
+}
 th:first-child,td:first-child{text-align:center}
 
 @media(max-width:900px){
@@ -108,145 +121,168 @@ th:first-child,td:first-child{text-align:center}
 <!-- LEFT -->
 <div class="card">
 
-<div class="section">
-<h3>Currency</h3>
-<select id="currency">
-<option value="USD">USD ($)</option>
-<option value="EUR">EUR (€)</option>
-<option value="GBP">GBP (£)</option>
-<option value="INR">INR (₹)</option>
-</select>
-</div>
+  <div class="section">
+    <label>Currency</label>
+    <select id="currency">
+      <option value="USD">USD ($)</option>
+      <option value="EUR">EUR (€)</option>
+      <option value="GBP">GBP (£)</option>
+      <option value="INR">INR (₹)</option>
+    </select>
+  </div>
 
-<div class="section">
-<h3>Debt Accounts</h3>
+  <div class="section">
+    <label>Debt 1 – Balance</label>
+    <input id="b1" value="5000" type="number">
+    <label>Debt 1 – APR (%)</label>
+    <input id="r1" value="18" type="number">
+    <label>Debt 1 – Min Payment</label>
+    <input id="m1" value="150" type="number">
+  </div>
 
-<label>Debt 1 – Balance</label>
-<input id="b1" value="5000" type="number">
-<label>Debt 1 – APR (%)</label>
-<input id="r1" value="18" type="number">
-<label>Debt 1 – Min Payment</label>
-<input id="m1" value="150" type="number">
+  <div class="section">
+    <label>Debt 2 – Balance</label>
+    <input id="b2" value="8000" type="number">
+    <label>Debt 2 – APR (%)</label>
+    <input id="r2" value="12" type="number">
+    <label>Debt 2 – Min Payment</label>
+    <input id="m2" value="200" type="number">
+  </div>
 
-<label>Debt 2 – Balance</label>
-<input id="b2" value="8000" type="number">
-<label>Debt 2 – APR (%)</label>
-<input id="r2" value="12" type="number">
-<label>Debt 2 – Min Payment</label>
-<input id="m2" value="200" type="number">
+  <div class="section">
+    <label>Debt 3 – Balance</label>
+    <input id="b3" value="15000" type="number">
+    <label>Debt 3 – APR (%)</label>
+    <input id="r3" value="6" type="number">
+    <label>Debt 3 – Min Payment</label>
+    <input id="m3" value="300" type="number">
+  </div>
 
-<label>Debt 3 – Balance</label>
-<input id="b3" value="15000" type="number">
-<label>Debt 3 – APR (%)</label>
-<input id="r3" value="6" type="number">
-<label>Debt 3 – Min Payment</label>
-<input id="m3" value="300" type="number">
-</div>
+  <div class="section">
+    <label>Extra Monthly Payment</label>
+    <input id="extra" value="200" type="number">
+  </div>
 
-<div class="section">
-<h3>Extra Monthly Payment</h3>
-<input id="extra" value="200" type="number">
-</div>
-
-<button class="primary" onclick="calculate()">Calculate Avalanche</button>
-<button class="secondary" onclick="location.reload()">Reset</button>
-
+  <button class="primary" onclick="calculate()">Calculate Avalanche</button>
+  <button class="secondary" onclick="location.reload()">Reset</button>
 </div>
 
 <!-- RIGHT -->
 <div class="card">
 
-<div class="results">
-<div class="result"><b id="months">–</b><small>Months to Debt-Free</small></div>
-<div class="result"><b id="interest">–</b><small>Total Interest</small></div>
-<div class="result"><b id="paid">–</b><small>Total Paid</small></div>
-<div class="result"><b id="date">–</b><small>Debt-Free Date</small></div>
-</div>
+  <div class="results">
+    <div class="result"><b id="months">–</b><small>Months to Debt-Free</small></div>
+    <div class="result"><b id="interest">–</b><small>Total Interest</small></div>
+    <div class="result"><b id="paid">–</b><small>Total Paid</small></div>
+    <div class="result"><b id="date">–</b><small>Debt-Free Date</small></div>
+  </div>
 
-<div class="progress"><span id="bar"></span></div>
+  <div class="progress"><span id="bar"></span></div>
 
-<h3>Debt Balance Over Time</h3>
-<div class="chart-box"><canvas id="chart"></canvas></div>
+  <div class="chart-box">
+    <canvas id="chart"></canvas>
+  </div>
 
-<h3>Payoff Schedule</h3>
-<div class="table-wrap">
-<div class="table-body">
-<table>
-<thead>
-<tr><th>Month</th><th>Remaining Balance</th></tr>
-</thead>
-<tbody id="rows"></tbody>
-</table>
-</div>
-</div>
+  <h3>Payoff Schedule</h3>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Month</th><th>Remaining Balance</th></tr>
+      </thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </div>
 
-<br>
-<button class="primary" onclick="window.print()">🖨 Print / Export PDF</button>
-
+  <br>
+  <button class="primary" onclick="window.print()">🖨 Print / Export PDF</button>
 </div>
 
 </div>
 </div>
 
 <script>
+const $ = id => document.getElementById(id);
 let chart;
 
-const $ = id => document.getElementById(id);
-const money = n => new Intl.NumberFormat("en-US",{style:"currency",currency:$("currency").value}).format(n);
+function money(n){
+  return new Intl.NumberFormat("en-US",{style:"currency",currency:$("currency").value}).format(n);
+}
 
 function calculate(){
-  let debts = [
+  let debts=[
     {bal:+b1.value, rate:+r1.value/100/12, min:+m1.value},
     {bal:+b2.value, rate:+r2.value/100/12, min:+m2.value},
     {bal:+b3.value, rate:+r3.value/100/12, min:+m3.value}
-  ];
+  ].filter(d=>d.bal>0);
 
-  let extra = +extra.value;
-  let month=0, totalInterest=0, totalPaid=0;
-  let startTotal = debts.reduce((a,d)=>a+d.bal,0);
-  let balances=[], labels=[], rows="";
+  debts.sort((a,b)=>b.rate-a.rate);
 
-  while(debts.some(d=>d.bal>0) && month<600){
+  let extraPay=+extra.value;
+  let totalBal=debts.reduce((s,d)=>s+d.bal,0);
+  let startBal=totalBal;
+
+  let rows="", labels=[], balances=[];
+  let month=0, interest=0, paid=0;
+
+  while(totalBal>0 && month<600){
     month++;
+    let availExtra=extraPay;
 
-    debts.sort((a,b)=>b.rate-a.rate); // AVALANCHE
-
-    let pool = extra;
     debts.forEach(d=>{
       if(d.bal<=0) return;
-      let interest = d.bal * d.rate;
-      d.bal += interest;
-      totalInterest += interest;
+      let int=d.bal*d.rate;
+      d.bal+=int;
+      interest+=int;
 
-      let pay = Math.min(d.min + pool, d.bal);
-      pool = Math.max(0, pool - (pay - d.min));
-      d.bal -= pay;
-      totalPaid += pay;
-      d.bal = Math.max(0, +d.bal.toFixed(2));
+      let pay=d.min;
+      d.bal-=pay;
+      paid+=pay;
     });
 
-    let total = debts.reduce((a,d)=>a+d.bal,0);
-    balances.push(total);
+    for(let d of debts){
+      if(d.bal<=0) continue;
+      let p=Math.min(availExtra,d.bal);
+      d.bal-=p;
+      paid+=p;
+      availExtra-=p;
+      if(availExtra<=0) break;
+    }
+
+    totalBal=debts.reduce((s,d)=>s+Math.max(0,d.bal),0);
+
     labels.push("M"+month);
-    rows += `<tr><td>${month}</td><td>${money(total)}</td></tr>`;
+    balances.push(totalBal);
+
+    rows+=`<tr><td>${month}</td><td>${money(totalBal)}</td></tr>`;
   }
 
-  months.textContent = month;
-  interest.textContent = money(totalInterest);
-  paid.textContent = money(totalPaid);
-  rowsEl.innerHTML = rows;
+  $("months").textContent=month;
+  $("interest").textContent=money(interest);
+  $("paid").textContent=money(paid);
+  $("rows").innerHTML=rows;
+  $("bar").style.width=((1-totalBal/startBal)*100).toFixed(1)+"%";
 
-  bar.style.width = ((1-balances.at(-1)/startTotal)*100).toFixed(1)+"%";
-
-  let d = new Date();
+  let d=new Date();
   d.setMonth(d.getMonth()+month);
-  date.textContent = d.toLocaleDateString();
+  $("date").textContent=d.toLocaleDateString();
 
   chart?.destroy();
-  chart = new Chart(chartEl,{
+  chart=new Chart($("chart"),{
     type:"line",
-    data:{labels,datasets:[{data:balances,fill:true,borderColor:"#2563eb",backgroundColor:"rgba(37,99,235,.1)"}]},
-    options:{plugins:{legend:{display:false}}}
+    data:{
+      labels,
+      datasets:[{
+        data:balances,
+        borderColor:"#2563eb",
+        backgroundColor:"rgba(37,99,235,.15)",
+        fill:true,
+        tension:.3
+      }]
+    },
+    options:{
+      plugins:{legend:{display:false}},
+      scales:{y:{beginAtZero:true}}
+    }
   });
 }
 
